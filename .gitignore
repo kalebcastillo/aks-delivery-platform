@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+*.pyo
+*.pyd
+*.env
+.env
+venv/
+
+# Docker
+*.tar
+*.img
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+tfplan*
+.terraform.lock.hcl
+
+# Kubernetes
+*.kubeconfig
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# System
+.DS_Store
+Thumbs.db
+
+# Node (if any JS tooling)
+node_modules/
+
+# Ignore database and secrets
+*.db
+secrets.*
+
+# Ignore test output
+coverage/
+
+# Ignore build artifacts
+dist/
+build/
+
+# Ignore GitHub Actions artifacts
+.github/workflows/*.tmp
+
+# Ignore local scripts output
+scripts/bash/*.out

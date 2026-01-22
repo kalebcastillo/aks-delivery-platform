@@ -1,0 +1,6 @@
+FROM postgres:15
+
+COPY database_setup.sql /docker-entrypoint-initdb.d/database_setup.sql
+
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+  CMD pg_isready -U "${POSTGRES_USER:-postgres}"
