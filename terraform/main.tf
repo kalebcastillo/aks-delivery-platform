@@ -1,30 +1,38 @@
 # Main Terraform entrypoint for AKS Delivery Platform
 
 module "resource_group" {
-  source  = "Azure/avm-res-azurerm-resource-group/azurerm"
-  version = "~> 1.0"
+  source  = "Azure/avm-res-resources-resourcegroup/azurerm"
+  version = "~> 0.2"
   name     = var.resource_group_name
   location = var.location
   enable_telemetry = true
 }
 
 module "vnet" {
-  source  = "Azure/avm-res-azurerm-virtual-network/azurerm"
-  version = "~> 1.0"
+  source  = "Azure/avm-res-network-virtualnetwork/azurerm"
+  version = "~> 0.17"
   name                = var.vnet_name
   location            = var.location
-  resource_group_name = module.resource_group.name
+  parent_id           = module.resource_group.resource_id
   address_space       = [var.vnet_address_space]
   enable_telemetry    = true
 }
 
 module "aks" {
-  source  = "Azure/avm-res-azurerm-kubernetes-cluster/azurerm"
-  version = "~> 1.0"
+  source  = "Azure/avm-res-containerservice-managedcluster/azurerm"
+  version = "~> 0.3"
   name                = var.aks_name
   location            = var.location
   resource_group_name = module.resource_group.name
   dns_prefix          = var.aks_dns_prefix
+  managed_identities = {
+    system_assigned = true
+  }
+  azure_active_directory_role_based_access_control = {
+    tenant_id              = var.aad_tenant_id
+    admin_group_object_ids = [var.aad_admin_object_id]
+    azure_rbac_enabled     = true
+  }
   default_node_pool = {
     name       = "nodepool1"
     node_count = var.aks_node_count
@@ -58,7 +66,6 @@ module "aks" {
 #   enable_telemetry    = true
 # }
 
-output "kube_config" {
-  value = module.aks.kube_config
-  sensitive = true
-}
+# ArgoCD and GitOps setup is automated via: ./bootstrap.sh
+# This deploys the Helm chart and bootstraps the Application CR
+

@@ -1,3 +1,21 @@
+variable "subscription_id" {
+  description = "Azure subscription ID."
+  type        = string
+  sensitive   = true
+}
+
+variable "terraform_sp_client_id" {
+  description = "Service principal client ID for Terraform Kubernetes provider."
+  type        = string
+  sensitive   = true
+}
+
+variable "terraform_sp_client_secret" {
+  description = "Service principal client secret for Terraform Kubernetes provider."
+  type        = string
+  sensitive   = true
+}
+
 variable "resource_group_name" {
   description = "Name of the Azure Resource Group."
   type        = string
@@ -57,7 +75,17 @@ variable "aks_spot_max_price" {
   type        = number
   default     = -1
 }
+variable "aad_tenant_id" {
+  description = "Azure AD Tenant ID for AKS RBAC."
+  type        = string
+  sensitive   = true
+}
 
+variable "aad_admin_object_id" {
+  description = "Object ID of user/group for AKS cluster admin."
+  type        = string
+  sensitive   = true
+}
 variable "acr_name" {
   description = "Name of the Azure Container Registry."
   type        = string
