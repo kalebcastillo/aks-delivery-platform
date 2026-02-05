@@ -4,7 +4,7 @@ metadata:
   name: journal
   labels:
     app: journal
-    version: "2.0"
+    version: "3.0"
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -14,7 +14,7 @@ spec:
     metadata:
       labels:
         app: journal
-        version: "2.0"
+        version: "3.0"
     spec:
       serviceAccountName: journal
       containers:

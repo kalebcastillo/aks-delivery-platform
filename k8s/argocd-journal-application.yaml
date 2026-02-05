@@ -11,16 +11,14 @@ spec:
     path: k8s/journal
     helm:
       releaseName: journal
+      valueFiles:
+      - "prod-secrets.yaml"
       values: |
         replicaCount: 1
         
         configMap:
           LOG_LEVEL: "info"
           APP_ENV: "production"
-        
-        secrets:
-          API_KEY: "replace-with-real-api-key"
-          DB_PASSWORD: "replace-with-real-db-password"
   
   destination:
     server: https://kubernetes.default.svc

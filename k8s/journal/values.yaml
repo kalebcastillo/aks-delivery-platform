@@ -5,7 +5,7 @@ replicaCount: 1
 api:
   image:
     repository: kalebcastillo/myapi
-    tag: "2.0"
+    tag: "3.0"
   port: 8000
 
 database:
