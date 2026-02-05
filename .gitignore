@@ -44,6 +44,7 @@ node_modules/
 *.db
 secrets.*
 *-secrets.yaml
+*secret-template.yaml
 
 # Ignore test output
 coverage/

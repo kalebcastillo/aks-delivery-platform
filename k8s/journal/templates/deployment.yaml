@@ -69,7 +69,10 @@ spec:
         - name: DB_PORT
           value: "{{ .Values.database.port }}"
         - name: DATABASE_URL
-          value: "{{ .Values.api.databaseUrl }}"
+          valueFrom:
+            secretKeyRef:
+              name: journal
+              key: DATABASE_URL
       
       # Database Container
       - name: database

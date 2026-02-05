@@ -7,7 +7,6 @@ api:
     repository: kalebcastillo/myapi
     tag: "3.0"
   port: 8000
-  databaseUrl: ""
 
 database:
   image:
@@ -27,6 +26,3 @@ configMap:
   LOG_LEVEL: "info"
   APP_ENV: "production"
 
-secrets:
-  API_KEY: ""
-  DB_PASSWORD: ""

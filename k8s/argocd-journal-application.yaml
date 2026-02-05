@@ -11,8 +11,6 @@ spec:
     path: k8s/journal
     helm:
       releaseName: journal
-      valueFiles:
-      - "prod-secrets.yaml"
       values: |
         replicaCount: 1
         
