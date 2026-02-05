@@ -1,0 +1,98 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: journal
+  labels:
+    app: journal
+    version: "2.0"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: journal
+  template:
+    metadata:
+      labels:
+        app: journal
+        version: "2.0"
+    spec:
+      serviceAccountName: journal
+      containers:
+      # API Container
+      - name: api
+        image: "{{ .Values.api.image.repository }}:{{ .Values.api.image.tag }}"
+        ports:
+        - name: http
+          containerPort: {{ .Values.api.port }}
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        env:
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: journal
+              key: LOG_LEVEL
+        - name: APP_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: journal
+              key: APP_ENV
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: journal
+              key: API_KEY
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: journal
+              key: DB_PASSWORD
+        - name: DB_HOST
+          value: "localhost"
+        - name: DB_PORT
+          value: "{{ .Values.database.port }}"
+      
+      # Database Container
+      - name: database
+        image: "{{ .Values.database.image.repository }}:{{ .Values.database.image.tag }}"
+        ports:
+        - name: postgres
+          containerPort: {{ .Values.database.port }}
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 300m
+            memory: 512Mi
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: journal
+              key: DB_PASSWORD
+  
+  # Blue-Green Deployment Strategy
+  strategy:
+    blueGreen:
+      activeService: journal
+      previewService: journal-preview
+      autoPromotionEnabled: false
+

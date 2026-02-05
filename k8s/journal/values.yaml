@@ -1,0 +1,31 @@
+# Default values for journal application
+
+replicaCount: 1
+
+api:
+  image:
+    repository: kalebcastillo/myapi
+    tag: "2.0"
+  port: 8000
+
+database:
+  image:
+    repository: kalebcastillo/journaldb
+    tag: "1.0"
+  port: 5432
+
+serviceAccount:
+  create: true
+  automount: true
+  name: ""
+
+service:
+  port: 8000
+
+configMap:
+  LOG_LEVEL: "info"
+  APP_ENV: "production"
+
+secrets:
+  API_KEY: ""
+  DB_PASSWORD: ""

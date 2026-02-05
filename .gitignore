@@ -43,6 +43,7 @@ node_modules/
 # Ignore database and secrets
 *.db
 secrets.*
+*-secrets.yaml
 
 # Ignore test output
 coverage/

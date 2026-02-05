@@ -23,8 +23,10 @@ az aks get-credentials --resource-group aks-delivery-platform --name aks-deliver
 helm repo add argo https://argoproj.github.io/argo-helm
 helm repo update
 helm upgrade --install argocd argo/argo-cd -n argocd --create-namespace --version 7.3.0 --wait
+helm upgrade --install argo-rollouts argo/argo-rollouts -n argo-rollouts --create-namespace --wait
 
 kubectl apply -f "$PROJECT_DIR/k8s/argocd-application.yaml"
+kubectl apply -f "$PROJECT_DIR/k8s/argocd-journal-application.yaml"
 
 echo ""
 echo "✓ Bootstrap complete!"

@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: journal
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/kalebcastillo/aks-delivery-platform
+    targetRevision: HEAD
+    path: k8s/journal
+    helm:
+      releaseName: journal
+      values: |
+        replicaCount: 1
+        
+        configMap:
+          LOG_LEVEL: "info"
+          APP_ENV: "production"
+        
+        secrets:
+          API_KEY: "replace-with-real-api-key"
+          DB_PASSWORD: "replace-with-real-db-password"
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
