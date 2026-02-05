@@ -7,6 +7,7 @@ api:
     repository: kalebcastillo/myapi
     tag: "3.0"
   port: 8000
+  databaseUrl: ""
 
 database:
   image:

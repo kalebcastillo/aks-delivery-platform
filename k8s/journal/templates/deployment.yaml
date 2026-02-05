@@ -68,6 +68,8 @@ spec:
           value: "localhost"
         - name: DB_PORT
           value: "{{ .Values.database.port }}"
+        - name: DATABASE_URL
+          value: "{{ .Values.api.databaseUrl }}"
       
       # Database Container
       - name: database
