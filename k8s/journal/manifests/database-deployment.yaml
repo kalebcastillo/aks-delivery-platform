@@ -49,6 +49,9 @@ spec:
           capabilities:
             drop:
             - ALL
+            add:
+            - CHOWN
+            - FOWNER
         volumeMounts:
         - name: db-data
           mountPath: /var/lib/postgresql/data
