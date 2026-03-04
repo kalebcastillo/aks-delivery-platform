@@ -36,8 +36,6 @@ spec:
       volumes:
       - name: tmp
         emptyDir: {}
-      - name: db-data
-        emptyDir: {}
       containers:
       - name: api
         image: kalebcastillo/myapi:3.0
@@ -86,7 +84,7 @@ spec:
               name: journal
               key: DB_PASSWORD
         - name: DB_HOST
-          value: "localhost"
+          value: "journal-db"
         - name: DB_PORT
           value: "5432"
         - name: DATABASE_URL
@@ -94,34 +92,6 @@ spec:
             secretKeyRef:
               name: journal
               key: DATABASE_URL
-      - name: database
-        image: kalebcastillo/journaldb:1.0
-        imagePullPolicy: IfNotPresent
-        ports:
-        - name: postgres
-          containerPort: 5432
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: false
-          capabilities:
-            drop:
-            - ALL
-        volumeMounts:
-        - name: db-data
-          mountPath: /var/lib/postgresql/data
-        resources:
-          requests:
-            cpu: 100m
-            memory: 256Mi
-          limits:
-            cpu: 300m
-            memory: 512Mi
-        env:
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: journal
-              key: DB_PASSWORD
   strategy:
     blueGreen:
       activeService: journal
