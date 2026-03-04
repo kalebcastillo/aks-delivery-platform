@@ -35,10 +35,11 @@ module "aks" {
   }
   default_node_pool = {
     name       = "nodepool1"
+    temporary_name_for_rotation = "nodepool1rot"
     node_count = var.aks_node_count
     vm_size    = var.aks_node_vm_size
     enable_auto_scaling = false
-    os_disk_size_gb = 30
+    os_disk_size_gb = 60
     type = "VirtualMachineScaleSets"
     orchestrator_version = null
     mode = "System"
