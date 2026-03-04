@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: node-exporter
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: node-exporter
+    app.kubernetes.io/instance: monitoring
+    app.kubernetes.io/version: "1.7.0"
+    app.kubernetes.io/component: exporter
+    app.kubernetes.io/part-of: monitoring
+    app.kubernetes.io/managed-by: manifests
+    environment: production
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: node-exporter
+    app.kubernetes.io/instance: monitoring
+  ports:
+  - name: metrics
+    port: 9100
+    targetPort: metrics

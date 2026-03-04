@@ -31,7 +31,7 @@ $KUBESEAL_CMD -f "$SOURCE_SECRET_FILE" \
   --format yaml \
   --name journal \
   --namespace default \
-  --controller-namespace sealed-secrets
+  --controller-namespace kube-system
 
 echo "✓ Sealed secret created at k8s/journal/manifests/sealedsecret.yaml"
 echo "  This encrypted secret is safe to commit to Git"

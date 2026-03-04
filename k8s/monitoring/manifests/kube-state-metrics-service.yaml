@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kube-state-metrics
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/instance: monitoring
+    app.kubernetes.io/version: "2.12.0"
+    app.kubernetes.io/component: exporter
+    app.kubernetes.io/part-of: monitoring
+    app.kubernetes.io/managed-by: manifests
+    environment: production
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: kube-state-metrics
+    app.kubernetes.io/instance: monitoring
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+  - name: telemetry
+    port: 8081
+    targetPort: telemetry
