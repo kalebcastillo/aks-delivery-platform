@@ -20,16 +20,24 @@ az role assignment create \
 
 az aks get-credentials --resource-group aks-delivery-platform --name aks-delivery --overwrite-existing || true
 
-helm repo add argo https://argoproj.github.io/argo-helm
-helm repo update
-helm upgrade --install argocd argo/argo-cd -n argocd --create-namespace --version 7.3.0 --wait
-helm upgrade --install argo-rollouts argo/argo-rollouts -n argo-rollouts --create-namespace --wait
+kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
+kubectl create namespace argo-rollouts --dry-run=client -o yaml | kubectl apply -f -
+kubectl create namespace sealed-secrets --dry-run=client -o yaml | kubectl apply -f -
 
-kubectl apply -f "$PROJECT_DIR/k8s/argocd-application.yaml"
+# Install controllers without Helm
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl apply -n argo-rollouts -f https://raw.githubusercontent.com/argoproj/argo-rollouts/stable/manifests/install.yaml
+kubectl apply -n sealed-secrets -f https://raw.githubusercontent.com/bitnami-labs/sealed-secrets/main/controller.yaml
+
+# Seal local secrets into the manifests (requires .secrets/journal-secret.yaml)
+"$SCRIPT_DIR/seal-secrets.sh"
+
+# Apply only the journal-specific ArgoCD Application (not the generic watcher)
 kubectl apply -f "$PROJECT_DIR/k8s/argocd-journal-application.yaml"
 
 echo ""
 echo "✓ Bootstrap complete!"
+
 
 
 

@@ -8,15 +8,7 @@ spec:
   source:
     repoURL: https://github.com/kalebcastillo/aks-delivery-platform
     targetRevision: HEAD
-    path: k8s/journal
-    helm:
-      releaseName: journal
-      values: |
-        replicaCount: 1
-        
-        configMap:
-          LOG_LEVEL: "info"
-          APP_ENV: "production"
+    path: k8s/journal/manifests
   
   destination:
     server: https://kubernetes.default.svc

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: journal
+  labels:
+    app.kubernetes.io/name: journal
+    app.kubernetes.io/instance: journal
+    app.kubernetes.io/version: "3.0"
+    app.kubernetes.io/component: app
+    app.kubernetes.io/part-of: journal
+    app.kubernetes.io/managed-by: manifests
+    environment: production
+data:
+  LOG_LEVEL: "info"
+  APP_ENV: "production"

@@ -8,6 +8,12 @@ Complete one-command deployment of AKS infrastructure with GitOps.
 ./bootstrap.sh
 ```
 
+## Sealed Secrets Workflow
+
+- Create local secrets at `.secrets/journal-secret.yaml` (never commit).
+- Run `./scripts/bash/infra-bootstrap.sh` to install the controller, seal secrets, and apply ArgoCD.
+- Planned improvement: move sealing to GitHub Actions using repo secrets.
+
 This script automatically:
 1. Deploys Terraform infrastructure (RG, VNet, AKS)
 2. Configures kubectl credentials

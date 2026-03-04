@@ -1,0 +1,151 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: journal
+  labels:
+    app.kubernetes.io/name: journal
+    app.kubernetes.io/instance: journal
+    app.kubernetes.io/version: "3.0"
+    app.kubernetes.io/component: app
+    app.kubernetes.io/part-of: journal
+    app.kubernetes.io/managed-by: manifests
+    environment: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: journal
+      app.kubernetes.io/instance: journal
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: journal
+        app.kubernetes.io/instance: journal
+        app.kubernetes.io/version: "3.0"
+        app.kubernetes.io/component: app
+        app.kubernetes.io/part-of: journal
+        app.kubernetes.io/managed-by: manifests
+        environment: production
+    spec:
+      serviceAccountName: journal
+      automountServiceAccountToken: true
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      - name: db-data
+        emptyDir: {}
+      containers:
+      - name: api
+        image: kalebcastillo/myapi:3.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8000
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 10001
+          runAsGroup: 10001
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 2
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /health
+            port: http
+          periodSeconds: 5
+          failureThreshold: 30
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        env:
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: journal
+              key: LOG_LEVEL
+        - name: APP_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: journal
+              key: APP_ENV
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: journal
+              key: API_KEY
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: journal
+              key: DB_PASSWORD
+        - name: DB_HOST
+          value: "localhost"
+        - name: DB_PORT
+          value: "5432"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: journal
+              key: DATABASE_URL
+      - name: database
+        image: kalebcastillo/journaldb:1.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: postgres
+          containerPort: 5432
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: db-data
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 300m
+            memory: 512Mi
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: journal
+              key: DB_PASSWORD
+  strategy:
+    blueGreen:
+      activeService: journal
+      previewService: journal-preview
+      autoPromotionEnabled: false

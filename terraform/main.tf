@@ -25,13 +25,13 @@ module "aks" {
   location            = var.location
   resource_group_name = module.resource_group.name
   dns_prefix          = var.aks_dns_prefix
-  managed_identities = {
-    system_assigned = true
-  }
   azure_active_directory_role_based_access_control = {
+    azure_rbac_enabled     = true
     tenant_id              = var.aad_tenant_id
     admin_group_object_ids = [var.aad_admin_object_id]
-    azure_rbac_enabled     = true
+  }
+  managed_identities = {
+    system_assigned = true
   }
   default_node_pool = {
     name       = "nodepool1"
@@ -66,6 +66,51 @@ module "aks" {
 #   enable_telemetry    = true
 # }
 
-# ArgoCD and GitOps setup is automated via: ./bootstrap.sh
-# This deploys the Helm chart and bootstraps the Application CR
+output "kube_config" {
+  value = module.aks.kube_config
+  sensitive = true
+}
 
+# Helm provider for ArgoCD
+resource "helm_release" "argocd" {
+  name             = "argocd"
+  repository       = "https://argoproj.github.io/argo-helm"
+  chart            = "argo-cd"
+  namespace        = "argocd"
+  create_namespace = true
+  version          = "7.3.0"  # pin version
+
+  depends_on = [module.aks]
+}
+
+# ArgoCD Application pointing to your git repo
+resource "kubernetes_manifest" "argocd_app" {
+  manifest = {
+    apiVersion = "argoproj.io/v1alpha1"
+    kind       = "Application"
+    metadata = {
+      name      = "my-app"
+      namespace = "argocd"
+    }
+    spec = {
+      project = "default"
+      source = {
+        repoURL        = "https://github.com/kalebcastillo/aks-delivery-platform"
+        targetRevision = "HEAD"
+        path           = "k8s"
+      }
+      destination = {
+        server    = "https://kubernetes.default.svc"
+        namespace = "default"
+      }
+      syncPolicy = {
+        automated = {
+          prune   = true
+          selfHeal = true
+        }
+      }
+    }
+  }
+
+  depends_on = [helm_release.argocd]
+}
