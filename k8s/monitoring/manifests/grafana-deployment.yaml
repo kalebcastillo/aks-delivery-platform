@@ -89,7 +89,15 @@ spec:
         volumeMounts:
         - name: datasources
           mountPath: /etc/grafana/provisioning/datasources
+        - name: grafana-data
+          mountPath: /var/lib/grafana
+        - name: grafana-logs
+          mountPath: /var/log/grafana
       volumes:
       - name: datasources
         configMap:
           name: grafana-datasources
+      - name: grafana-data
+        emptyDir: {}
+      - name: grafana-logs
+        emptyDir: {}
